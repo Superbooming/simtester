@@ -1,0 +1,21 @@
+# model config
+model:
+  model_name: soloist-base
+  model_dir: /data02/guoshuyu-slurm/soloist/multiwoz/model/data-100_context-15/final_tr0.3454456596468458
+  max_length: 512
+  max_context_length: 460
+  max_turn: 15
+  recommend_coefficient: !!float 1.0
+
+# tokenizer config
+tokenizer:
+  special_tokens: data/multiwoz/soloist_tokenizer/special_tokens.txt
+  eos_token: <|endoftext|>
+
+# inference config
+inference:
+  num_sample: 1
+  temperature: !!float 1.0
+  repetition_penalty: !!float 1.0
+  top-k: 0
+  top-p: !!float 0.5
