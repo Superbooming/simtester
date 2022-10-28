@@ -1,0 +1,8 @@
+loguru==0.6.0
+nltk==3.4.5
+PyYAML==6.0
+requests==2.22.0
+simplejson==3.17.5
+torch==1.10.0+cu113
+tqdm==4.38.0
+transformers==4.12.5
