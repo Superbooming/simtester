@@ -1,10 +1,10 @@
 # Simtester
 
-[comment]: <> ([![Pypi Latest Version]&#40;https://img.shields.io/pypi/v/crslab&#41;]&#40;https://pypi.org/project/crslab&#41;)
-
-[comment]: <> ([![Release]&#40;https://img.shields.io/github/v/release/rucaibox/crslab.svg&#41;]&#40;https://github.com/rucaibox/crslab/releases&#41;)
+[![Pypi Latest Version](https://img.shields.io/pypi/v/simtester)](https://pypi.org/project/simtester)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![arXiv](https://img.shields.io/badge/arXiv-Simtester-%23B21B1B)](https://arxiv.org/abs/2204.00763)
+
+[comment]: <> ([![Release]&#40;https://img.shields.io/github/v/release/rucaibox/crslab.svg&#41;]&#40;https://github.com/rucaibox/crslab/releases&#41;)
 
 [comment]: <> ([![Documentation Status]&#40;https://readthedocs.org/projects/crslab/badge/?version=latest&#41;]&#40;https://crslab.readthedocs.io/en/latest/?badge=latest&#41;)
 
