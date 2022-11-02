@@ -18,7 +18,7 @@ own implemented model or our trained model and construct tester with different c
 evaluation, the user simulator you implemented interacts with agents in the tester, ranks them, and tester calculates
 the Exact Distinct score of the user simulator. [[paper]](https://arxiv.org/pdf/2204.00763.pdf)
 
-![Simtester](resource/fig/tester.png)
+![Simtester](https://raw.githubusercontent.com/Superbooming/simtester/master/resource/fig/tester.png?token=GHSAT0AAAAAABZU3BQINX6C27DQVICKNJBCY3CDAGA)
 
 - [Installation](#Installation)
 - [Quick-Start](#Quick-Start)
