@@ -1,7 +1,7 @@
 # model config
 model:
   model_name: soloist-base
-  model_dir: /data02/guoshuyu-slurm/soloist/multiwoz/model/data-100_context-15/final_tr0.3454456596468458
+  model_dir: /data02/guoshuyu-slurm/soloist/multiwoz/new_model/data-100_context-15/epoch9_0_tr0.4411450675968015
   max_length: 512
   max_context_length: 460
   max_turn: 15
