@@ -79,7 +79,7 @@ from simtester import Agent
 agent = Agent(your_model, your_model_interact_fn)
 
 # construct a gent using our trained model
-from simtester import MultiwozAgent
+from simtester import MultiWOZAgent
 agent = MultiWOZAgent('soloist-base', 'model/soloist-base') # fill model name and model directory
 agent = MultiWOZAgent(config='simtester/config/multiwoz.soloist-base.yaml') # fill config path
 

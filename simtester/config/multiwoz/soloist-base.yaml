@@ -14,7 +14,7 @@ tokenizer:
 
 # inference config
 inference:
-  num_sample: 1
+  num_sample: 5
   temperature: !!float 1.0
   repetition_penalty: !!float 1.0
   top-k: 0

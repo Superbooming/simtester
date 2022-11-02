@@ -54,9 +54,9 @@ class MultiWOZAgent(Agent):
             self.model_dir = self.config['model']['model_dir']
         else:
             self.model_name = model
-            self.model_dir = model_dir
             config_path = os.path.join(CONFIG_PATH, f'{self.model_name}.yaml')
             self.config = load_yaml_configs(config_path)
+            self.model_dir = model_dir if model_dir else self.config['model']['model_dir']
         self.device = torch.device(device) if device else torch.device(
             "cuda:0" if torch.cuda.is_available() else "cpu")
         logger.remove()
@@ -95,7 +95,7 @@ class MultiWOZAgent(Agent):
             self.slot_value = pkl.load(f)
         logger.info(f'[Dataset] Load MultiWOZ slot values.')
 
-    def _interact_fn(self, context: List[str]) -> str:
+    def _interact_fn(self, context: List[str], is_fill: bool = True, return_bs: bool = False) -> str:
         '''
         Decoding process of pretrained SOLOIST model in multiwoz dataset
 
@@ -143,6 +143,9 @@ class MultiWOZAgent(Agent):
                                        attention_mask=attention_mask, max_length=max_length, temperature=temperature,
                                        top_k=top_k, do_sample=True, num_return_sequences=num_samples,
                                        repetition_penalty=repetition_penalty, top_p=top_p)
+            text_list = tokenizer.batch_decode(generated, skip_special_tokens=True)
+            text_list = [txt.replace('!', '') for txt in text_list]
+            res, res_bs = parse_decoding_results_direct(text_list)
 
             def get_droped_bs(bs, num_drop=0.5):
                 remove_bs = {}
@@ -177,9 +180,7 @@ class MultiWOZAgent(Agent):
 
             if num_mask < 1.0:
                 # Analyze and change belief states
-                text_list = tokenizer.batch_decode(generated, skip_special_tokens=True)
                 remove_bs_list = []
-                res, res_bs = parse_decoding_results_direct(text_list)
                 replace_bs, remove_bs = get_droped_bs(res_bs, num_mask)
                 remove_bs_list.append(remove_bs)
                 bs_str = convert_to_str(replace_bs)
@@ -207,15 +208,19 @@ class MultiWOZAgent(Agent):
                                            temperature=temperature, top_k=top_k, do_sample=True,
                                            num_return_sequences=num_samples, repetition_penalty=repetition_penalty,
                                            top_p=top_p)
-            return generated
+                text_list = self.tokenizer.batch_decode(generated, skip_special_tokens=True)
+                res, res_bs = parse_decoding_results_direct(text_list)
+            return res, res_bs
 
         def add_prefix(context: List[str]) -> List[str]:
             prefix_context = []
             is_user = True
             for c in context:
                 if is_user:
+                    c = c.replace('user:', 'user :')
                     prefix_context.append(c if c.startswith('user :') else 'user :' + c)
                 else:
+                    c = c.replace('system:', 'system :')
                     prefix_context.append(c if c.startswith('system :') else 'system :' + c)
                 is_user = not is_user
             return prefix_context
@@ -224,15 +229,20 @@ class MultiWOZAgent(Agent):
         context_tokens, token_type_ids, attention_masks = embed_context(context, self.tokenizer,
                                                                         self.config['model']['max_turn'],
                                                                         self.config['model']['max_context_length'])
-        out = generate_sequence(model=self.model, tokenizer=self.tokenizer, context=[context_tokens],
+        res, res_bs = generate_sequence(model=self.model, tokenizer=self.tokenizer, context=[context_tokens],
                                     token_type_ids=[token_type_ids], attention_mask=[attention_masks],
                                     num_samples=self.config['inference']['num_sample'],
                                     temperature=self.config['inference']['temperature'],
                                     top_k=self.config['inference']['top-k'], top_p=self.config['inference']['top-p'],
                                     repetition_penalty=self.config['inference']['repetition_penalty'],
                                     device=self.device, num_mask=self.config['model']['recommend_coefficient'])
-        text_list = self.tokenizer.batch_decode(out, skip_special_tokens=True)
-        res, res_bs = parse_decoding_results_direct(text_list)
-        talk = get_talk(res_bs, res)
-        res_fill = fill(res, res_bs, talk)
-        return res_fill
+
+        if is_fill:
+            talk = get_talk(res_bs, res)
+            res_fill = fill(res, res_bs, talk)
+            ret = res_fill
+        else:
+            ret = res
+        if return_bs:
+            ret = (ret, res_bs)
+        return ret

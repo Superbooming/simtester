@@ -7,6 +7,7 @@ import copy
 import random
 from nltk.tokenize import word_tokenize
 from collections import defaultdict
+from loguru import logger
 
 from simtester.utils.multiwoz.evaluate import MultiWozDB
 
@@ -375,3 +376,24 @@ def parse_decoding_results_direct(predictions):
                 candidates = value
 
             return candidates, candidates_bs
+
+def parse_belief_state(text):
+    belief_state = {}
+    text = text.strip('"').strip('[').strip(']')
+    domian_list = text.split('|')
+    for domain in domian_list:
+        domain_bs = {}
+        bs_list = domain.split(';')
+        for bs in bs_list:
+            kv_list = bs.split('=')
+            k = kv_list[0].strip()
+            v = kv_list[-1].strip()
+            domain_bs[k] = v
+        try:
+            belief_state[domain_bs['domain']] = {}
+        except:
+            logger.info(text)
+        for k, v in domain_bs.items():
+            if k in domain_attr[domain_bs['domain']]:
+                belief_state[domain_bs['domain']][k] = v
+    return belief_state
