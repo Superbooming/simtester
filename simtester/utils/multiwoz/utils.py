@@ -17,6 +17,9 @@ domain_attr = {
     'restaurant': ['id', 'address', 'area', 'food', 'introduction', 'name', 'phone', 'postcode', 'pricerange', 'location', 'type'],
     'hotel': ['id', 'address', 'area', 'internet', 'parking', 'single', 'double', 'family', 'name', 'phone', 'postcode', 'pricerange', 'takesbookings', 'stars', 'type'],
     'train': ['id', 'arriveBy', 'day', 'departure', 'destination', 'duration', 'leaveAt', 'price'],
+    'police': ['name', 'address', 'id', 'phone', 'postcode'],
+    'taxi': ['type', 'phone'],
+    'hospital': ['department', 'id', 'phone'],
 }
 domain_attr_all = {
     'attraction': ['id', 'address', 'area', 'entrance fee', 'name', 'phone', 'postcode', 'pricerange', 'openhours', 'type'],
