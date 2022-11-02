@@ -182,9 +182,12 @@ def fill(response, belief_state, talk):
             if response[idx].startswith('[') and response[idx].endswith(']'):
                 response[idx] = response[idx][1:-1]
                 # logging.info(talk + ' -> ' + slot + ' -> ' + response[idx])
-        return ' '.join(response).replace('[', '').replace(']', '').replace('value_', '')
+        return post_process(' '.join(response).replace('[', '').replace(']', '').replace('value_', ''))
     except:
-        return ' '.join(response).replace('[', '').replace(']', '').replace('value_', '')
+        return post_process(' '.join(response).replace('[', '').replace(']', '').replace('value_', ''))
+
+def post_process(response: str) -> str:
+    return response.replace('taxi_type', taxi_dict['type']).replace('taxi_phone', taxi_dict['phone']).replace('taxi_time', taxi_dict['time'])
 
 def get_value(domain, belief_state, attr, slot_before:defaultdict):
     try:
