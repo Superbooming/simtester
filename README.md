@@ -60,8 +60,6 @@ git clone https://github.com/Superbooming/simtester && cd simtester
 pip install -e .
 ```
 
-We will upload Simtester to pypi soon.
-
 ## Quick-Start
 
 When you construct a agent using your own implemented model, you should fill your model instance `your_model`
