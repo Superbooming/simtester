@@ -18,8 +18,8 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Human Machine Interfaces"
 ]
 
-# with open("README.md", "r", encoding="utf-8") as f:
-#     long_description = f.read()
+with open("README.md", "r", encoding="utf-8") as f:
+    long_description = f.read()
 
 setup(
     name='simtester',
@@ -27,9 +27,9 @@ setup(
     author='shuyu guo',
     author_email='guoshuyu225@gmail.com',
     description='An Open-Source Toolkit for Evaluating User Simulator of Task-oriented Dialogue System',
-    # long_description=long_description,
-    # long_description_content_type="text/markdown",
-    # url='https://github.com/RUCAIBox/CRSLab',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url='https://github.com/Superbooming/simtester',
     packages=[
         package for package in find_packages()
         if package.startswith('simtester')
