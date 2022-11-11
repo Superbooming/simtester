@@ -45,15 +45,15 @@ Simtester requires Python version 3.6 or later.
 
 [comment]: <> (Simtester requires torch version 1.4.0 or later. If you want to use CRSLab with GPU, please ensure that CUDA or CUDAToolkit version is 9.2 or later. Please use the combinations shown in this [Link]&#40;https://pytorch-geometric.com/whl/&#41; to ensure the normal operation of PyTorch Geometric.)
 
-[comment]: <> (You can install from pip:)
+You can install from pip(the current version is the old version and we will update it soon):
 
-[comment]: <> (```bash)
+```bash
 
-[comment]: <> (pip install simtester)
+pip install simtester
 
-[comment]: <> (```)
+```
 
-You can install Simtester from source:
+Or you can install Simtester from source:
 
 ```bash
 git clone https://github.com/Superbooming/simtester && cd simtester
