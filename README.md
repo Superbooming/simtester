@@ -77,9 +77,9 @@ from simtester import Agent
 agent = Agent(your_model, your_model_interact_fn)
 
 # construct a gent using our trained model
-from simtester import MultiWOZAgent
-agent = MultiWOZAgent('soloist-base', 'model/soloist-base') # fill model name and model directory
-agent = MultiWOZAgent(config='simtester/config/multiwoz.soloist-base.yaml') # fill config path
+from simtester import SoloistAgent
+agent = SoloistAgent('multiwoz-soloist-base') # fill model name and model directory
+agent = SoloistAgent(config='simtester/config/multiwoz/soloist-base.yaml') # fill config path
 
 # interact with agent and get the response
 resopnse = agent.interact('I want to book a resturant in the center of city.')
@@ -109,7 +109,7 @@ from simtester import Tester
 tester = Tester([agentA, agentB, agentC], [2, 1, 3])
 
 # construct tester with strategy we provided
-tester = Tester('context-tester')
+tester = Tester('multiwoz-context-tester')
 
 # interact with tester
 tester.interact(['I want to book a resturant.', 

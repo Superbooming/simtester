@@ -1,10 +1,21 @@
 import math
 import re
+import os
 from collections import Counter
 from nltk.util import ngrams
 
+from simtester.config.multiwoz.config import DATA_PATH
+
 timepat = re.compile("\d{1,2}[:]\d{1,2}")
 pricepat = re.compile("\d{1,3}[.]\d{1,2}")
+
+mapping_path = os.path.join(DATA_PATH, 'dataset/mapping.pair')
+replacements = []
+with open(mapping_path, 'r') as fin:
+    for line in fin.readlines():
+        tok_from, tok_to = line.replace('\n', '').split('\t')
+        replacements.append((' ' + tok_from + ' ', ' ' + tok_to + ' '))
+
 
 def insertSpace(token, text):
     sidx = 0
@@ -25,7 +36,7 @@ def insertSpace(token, text):
     return text
 
 
-def normalize(text, replacements):
+def normalize(text):
     # lower case every word
     text = text.lower()
 

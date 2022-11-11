@@ -15,14 +15,11 @@ from simtester.utils import load_yaml_configs
 class Tester(object):
     def __init__(self, agents: Union[List[Agent], str], rank: Optional[List[int]] = None, end_token: str = '[END]'):
         if isinstance(agents, str):
-            dataset = agents.split('-')[0]
-            agents = '-'.join(agents.split('-')[1:])
-            if agents in tester_register_table[dataset]:
+            if agents in tester_register_table:
                 self.agents = []
-                for agent in tester_register_table[dataset][agents]:
+                for agent in tester_register_table[agents]:
                     yaml_config = load_yaml_configs(agent)
-                    agent_name = '-'.join(yaml_config['model_name'].split('-')[1:])
-                    agent = agent_mapping[agent_name](config=agent)
+                    agent = agent_mapping[yaml_config['model_name']](config=agent)
                     self.agents.append(agent)
             else:
                 raise NotImplementedError(f'The tester [{agents}] has not been implemented')

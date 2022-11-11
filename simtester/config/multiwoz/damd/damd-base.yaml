@@ -1,0 +1,92 @@
+model_name: multiwoz-damd-base
+vocab_path_eval: data/multi-woz-processed/vocab
+data_path: data/multi-woz-processed/
+data_file: data_for_damd.json
+dev_list: data/multi-woz/valListFile.json
+test_list: data/multi-woz/testListFile.json
+dbs: {
+    attraction: db/attraction_db_processed.json,
+    hospital: db/hospital_db_processed.json,
+    hotel: db/hotel_db_processed.json,
+    police: db/police_db_processed.json,
+    restaurant: db/restaurant_db_processed.json,
+    taxi: db/taxi_db_processed.json,
+    train: db/train_db_processed.json,
+}
+glove_path: ./data/glove/glove.6B.50d.txt
+domain_file_path: data/multi-woz-processed/domain_files.json
+slot_value_set_path: db/value_set_processed.json
+multi_acts_path: data/multi-woz-processed/multi_act_mapping_train.json
+exp_path: to be generated
+log_time: time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+
+# experiment settings
+mode: unknown
+cuda: True
+cuda_device: [1]
+exp_no: 
+seed: 11
+exp_domains: [all]
+save_log: True
+report_interval: 5
+max_nl_length: 60
+max_span_length: 30
+truncated: False
+
+# model settings
+vocab_size: 3000
+embed_size: 50
+hidden_size: 100
+pointer_dim: 6 # fixed
+enc_layer_num: 1
+dec_layer_num: 1
+dropout: 0
+layer_norm: False
+skip_connect: False
+encoder_share: False
+attn_param_share: False
+copy_param_share: False
+enable_aspn: True
+use_pvaspn: False
+enable_bspn: True
+bspn_mode: bspn # bspn or bsdx
+enable_dspn: False # removed
+enable_dst: False
+
+# training settings
+lr: 0.005
+label_smoothing: .0
+lr_decay: 0.5
+batch_size: 128
+epoch_num: 100
+early_stop_count: 5
+weight_decay_count: 3
+teacher_force: 100
+multi_acts_training: False
+multi_act_sampling_num: 1
+valid_loss: score
+
+# evaluation settings
+eval_load_path: all_aug_sample3_sd777_lr0.005_bs80_sp5_dc3
+eval_per_domain: False
+use_true_pv_resp: True
+use_true_prev_bspn: False
+use_true_prev_aspn: False
+use_true_prev_dspn: False
+use_true_curr_bspn: False
+use_true_curr_aspn: False
+use_true_bspn_for_ctr_eval: False
+use_true_domain_for_ctr_eval: False
+use_true_db_pointer: False
+limit_bspn_vocab: False
+limit_aspn_vocab: False
+same_eval_as_cambridge: True
+same_eval_act_f1_as_hdsa: False
+aspn_decode_mode: greedy  #beam, greedy, nucleur_sampling, topk_sampling
+beam_width: 5
+nbest: 5
+beam_diverse_param: 0.2
+act_selection_scheme: high_test_act_f1
+topk_num: 1
+nucleur_p: 0.
+record_mode: False

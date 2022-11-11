@@ -1,0 +1,15 @@
+# model config
+model_name: multiwoz-soloist-base
+max_length: 512
+max_context_length: 460
+max_turn: 15
+recommend_coefficient: !!float 0.4
+
+eos_token: <|endoftext|>
+
+# inference config
+num_sample: 5
+temperature: !!float 1.0
+repetition_penalty: !!float 1.0
+top-k: 0
+top-p: !!float 0.5

@@ -82,7 +82,7 @@ def fill(response, belief_state, talk):
                             slot_before[domain + '_' + attr].append(filled)
                         continue
                 else:
-                    if attr == 'count' or 'choice':
+                    if attr == 'count':
                         if talk in ['police', 'taxi']:
                             response[idx] = str(1)
                             continue
@@ -167,7 +167,7 @@ def fill(response, belief_state, talk):
                                                 if filled not in slot_before[k + '_' + attr]:
                                                     slot_before[k + '_' + attr].append(filled)
                                                     continue
-            if 'count' in response[idx] or 'choice' in response[idx]:
+            if 'count' in response[idx]:
                 response[idx] = str(3)
             # if 'place' in response[idx]:
             #     response[idx] = 'place'
@@ -182,12 +182,9 @@ def fill(response, belief_state, talk):
             if response[idx].startswith('[') and response[idx].endswith(']'):
                 response[idx] = response[idx][1:-1]
                 # logging.info(talk + ' -> ' + slot + ' -> ' + response[idx])
-        return post_process(' '.join(response).replace('[', '').replace(']', '').replace('value_', ''))
+        return ' '.join(response).replace('[', '').replace(']', '').replace('value_', '')
     except:
-        return post_process(' '.join(response).replace('[', '').replace(']', '').replace('value_', ''))
-
-def post_process(response: str) -> str:
-    return response.replace('taxi_type', taxi_dict['type']).replace('taxi_phone', taxi_dict['phone']).replace('taxi_time', taxi_dict['time'])
+        return ' '.join(response).replace('[', '').replace(']', '').replace('value_', '')
 
 def get_value(domain, belief_state, attr, slot_before:defaultdict):
     try:

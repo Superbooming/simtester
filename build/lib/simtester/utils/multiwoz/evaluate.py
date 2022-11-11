@@ -8,9 +8,9 @@ import sqlite3
 import os
 
 from simtester.utils.multiwoz.nlp import normalize
-from simtester.config.multiwoz.config import ARCHIVE_PATH
+from simtester.config.multiwoz.config import ROOT_PATH
 
-DATA_PATH = ARCHIVE_PATH
+DATA_PATH = os.path.join(ROOT_PATH, 'data/multiwoz/dataset/')
 
 class MultiWozDB(object):
     # loading databases
@@ -29,12 +29,6 @@ class MultiWozDB(object):
     with open(hospital_db_path, 'r') as f:
         hospital_db = json.load(f)
     all_items = {}
-    mapping_path = os.path.join(ARCHIVE_PATH, 'soloist-archive/mapping.pair')
-    replacements = []
-    with open(mapping_path, 'r') as fin:
-        for line in fin.readlines():
-            tok_from, tok_to = line.replace('\n', '').split('\t')
-            replacements.append((' ' + tok_from + ' ', ' ' + tok_to + ' '))
     # for domain in domains:
     #     if domain != 'taxi' and domain != 'hospital':
     #         sql_query = "select * from {}".format(domain)
@@ -110,7 +104,7 @@ class MultiWozDB(object):
                     if flag:
                         sql_query += " where "
                         val2 = val.replace("'", "''")
-                        val2 = normalize(val2, self.replacements)
+                        val2 = normalize(val2)
                         if key.lower() == 'leaveAt'.lower():
                             sql_query += r" " + key + " > " + r"'" + val2 + r"'"
                         elif key.lower() == 'arriveBy'.lower():
@@ -122,7 +116,7 @@ class MultiWozDB(object):
                         flag = False
                     else:
                         val2 = val.replace("'", "''")
-                        val2 = normalize(val2, self.replacements)
+                        val2 = normalize(val2)
                         if key.lower() == 'leaveAt'.lower():
                             sql_query += r" and " + key + " > " + r"'" + val2 + r"'"
                         elif key.lower() == 'arriveBy'.lower():

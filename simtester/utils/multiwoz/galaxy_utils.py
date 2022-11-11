@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
-# @Time : 2022/10/27 9:06 
+# @Time : 2022/11/10 23:07 
 # @Author : Shuyu Guo
-# @File : utils.py 
+# @File : galaxy_utils.py 
 # @contact : guoshuyu225@gmail.com
 import copy
 import random
@@ -13,18 +13,12 @@ from simtester.utils.multiwoz.evaluate import MultiWozDB
 
 db = MultiWozDB()
 domain_attr = {
-    'attraction': ['id', 'address', 'area', 'entrance fee', 'name', 'phone', 'postcode', 'pricerange', 'openhours', 'type'],
-    'restaurant': ['id', 'address', 'area', 'food', 'introduction', 'name', 'phone', 'postcode', 'pricerange', 'location', 'type'],
-    'hotel': ['id', 'address', 'area', 'internet', 'parking', 'single', 'double', 'family', 'name', 'phone', 'postcode', 'pricerange', 'takesbookings', 'stars', 'type'],
-    'train': ['id', 'arriveBy', 'day', 'departure', 'destination', 'duration', 'leaveAt', 'price'],
-    'police': ['name', 'address', 'id', 'phone', 'postcode'],
-    'taxi': ['type', 'phone'],
-    'hospital': ['department', 'id', 'phone'],
-}
-domain_attr_all = {
-    'attraction': ['id', 'address', 'area', 'entrance fee', 'name', 'phone', 'postcode', 'pricerange', 'openhours', 'type'],
-    'restaurant': ['id', 'address', 'area', 'food', 'introduction', 'name', 'phone', 'postcode', 'pricerange', 'location', 'type'],
-    'hotel': ['id', 'address', 'area', 'internet', 'parking', 'single', 'double', 'family', 'name', 'phone', 'postcode', 'pricerange', 'takesbookings', 'stars', 'type'],
+    'attraction': ['id', 'address', 'area', 'entrance fee', 'name', 'phone', 'postcode', 'pricerange', 'openhours',
+                   'type'],
+    'restaurant': ['id', 'address', 'area', 'food', 'introduction', 'name', 'phone', 'postcode', 'pricerange',
+                   'location', 'type'],
+    'hotel': ['id', 'address', 'area', 'internet', 'parking', 'single', 'double', 'family', 'name', 'phone', 'postcode',
+              'pricerange', 'takesbookings', 'stars', 'type'],
     'train': ['id', 'arriveBy', 'day', 'departure', 'destination', 'duration', 'leaveAt', 'price'],
     'police': ['name', 'address', 'id', 'phone', 'postcode'],
     'taxi': ['type', 'phone'],
@@ -43,10 +37,15 @@ taxi_dict = {
     "phone": "000000000",
     "time": "11:30",
 }
+hospital = {
+    'address': '124 tenison road',
+    'name': 'people hospital',
+    'postcode': 'cb12dp'
+}
 reference = '00000000'
 value_replace = {
     'time': {
-        'train': ['leaveAt', 'arriveBy']
+        'train': 'day'
     },
     'place': {
         'attraction': 'address',
@@ -54,33 +53,48 @@ value_replace = {
         'hotel': 'address',
         'train': ['departure', 'destination'],
         'police': 'address'
+    },
+    'car': {
+        'taxi': 'type'
+    },
+    'car type': {
+        'taxi': 'type'
+    },
+    'price': {
+        'attraction': 'entrance fee'
+    },
+    'leave': {
+        'train': 'leaveAt'
+    },
+    'arrive': {
+        'train': 'arriveBy'
+    },
+    'trainid': {
+        'train': 'id'
     }
 }
 current_domain = ['taxi', 'train', 'hotel', 'restaurant', 'attraction', 'hospital', 'police']
 eval_domains = ['restaurant', 'hotel', 'attraction', 'train', 'taxi', 'hospital']
 
+
 def fill(response, belief_state, talk):
     try:
         text = copy.deepcopy(response)
         slot_before = defaultdict(list)
-        if talk is None:
-            talk = 'hospital'
+        domain = talk
         response = response.split()
         for idx in range(len(response)):
             if response[idx].startswith('[') and response[idx].endswith(']'):
                 slot = response[idx][1:-1]
-                domain = slot.split('_')[0]
                 attr = slot.split('_')[-1]
-                if domain not in belief_state.keys():
-                    if domain in domain_attr.keys() or domain == 'taxi':
-                        domain = talk
-                if domain in domain_attr_all.keys():
-                    filled = get_value(domain, belief_state, attr, slot_before)
-                    if filled:
-                        response[idx] = str(filled)
-                        if filled not in slot_before[domain + '_' + attr]:
-                            slot_before[domain + '_' + attr].append(filled)
-                        continue
+                if attr in value_replace and domain in value_replace[attr]:
+                    attr = value_replace[attr][domain]
+                filled = get_value(domain, belief_state, attr, slot_before)
+                if filled:
+                    response[idx] = str(filled)
+                    if filled not in slot_before[attr]:
+                        slot_before[attr].append(filled)
+                    continue
                 else:
                     if attr == 'count' or 'choice':
                         if talk in ['police', 'taxi']:
@@ -139,12 +153,13 @@ def fill(response, belief_state, talk):
                             origin_attr = attr
                             if attr in value_replace.keys() and talk in value_replace[attr].keys():
                                 if talk == 'train' and (attr == 'time' or attr == 'place'):
-                                    if (talk + '_' +attr) not in slot_before.keys() and ('value_' +attr) not in slot_before.keys():
+                                    if (talk + '_' + attr) not in slot_before.keys() and (
+                                            'value_' + attr) not in slot_before.keys():
                                         attr = value_replace[attr][talk][0]
                                     else:
                                         attr = value_replace[attr][talk][1]
-                                    slot_before[talk + '_' +attr].append(attr)
-                                    slot_before['value_' +attr].append(attr)
+                                    slot_before[talk + '_' + attr].append(attr)
+                                    slot_before['value_' + attr].append(attr)
                                 else:
                                     attr = value_replace[attr][talk]
                             filled = get_value(talk, belief_state, attr, slot_before)
@@ -158,9 +173,10 @@ def fill(response, belief_state, talk):
                                 for k in belief_state.keys():
                                     if k != 'booking':
                                         attr = origin_attr
-                                        if origin_attr in value_replace.keys() and k in value_replace[origin_attr].keys():
+                                        if origin_attr in value_replace.keys() and k in value_replace[
+                                            origin_attr].keys():
                                             attr = value_replace[origin_attr][k]
-                                        if attr in domain_attr_all[k]:
+                                        if attr in domain_attr[k]:
                                             filled = get_value(k, belief_state, attr, slot_before)
                                             if filled:
                                                 response[idx] = str(filled)
@@ -186,117 +202,93 @@ def fill(response, belief_state, talk):
     except:
         return post_process(' '.join(response).replace('[', '').replace(']', '').replace('value_', ''))
 
-def post_process(response: str) -> str:
-    return response.replace('taxi_type', taxi_dict['type']).replace('taxi_phone', taxi_dict['phone']).replace('taxi_time', taxi_dict['time'])
 
-def get_value(domain, belief_state, attr, slot_before:defaultdict):
+def post_process(response: str) -> str:
+    return response.replace('taxi_type', taxi_dict['type']).replace('taxi_phone', taxi_dict['phone']).replace(
+        'taxi_time', taxi_dict['time'])
+
+
+def get_value(domain, belief_state, attr, slot_before: defaultdict):
     try:
+        if not domain:
+            return attr
         if attr == 'reference':
             return reference
-        if domain in belief_state.keys() and domain in domain_attr.keys():
-            venues = db.queryResultVenues(domain, bs=belief_state[domain])
-            if venues:
-                if attr in domain_attr[domain]:
-                    if slot_before[domain + '_' + attr]:
-                        for idx in range(len(venues)):
-                            if venues[idx][domain_attr[domain].index(attr)] not in slot_before[domain + '_' + attr]:
-                                return venues[idx][domain_attr[domain].index(attr)]
-                        return venues[0][domain_attr[domain].index(attr)]
-                    else:
-                        return venues[0][domain_attr[domain].index(attr)]
-            else:
-                venues = db.queryResultVenues(domain, bs={})
-                if attr in domain_attr[domain]:
-                    if slot_before[domain + '_' + attr]:
-                        for idx in range(len(venues)):
-                            if venues[idx][domain_attr[domain].index(attr)] not in slot_before[domain + '_' + attr]:
-                                return venues[idx][domain_attr[domain].index(attr)]
-                        return venues[0][domain_attr[domain].index(attr)]
-                    else:
-                        return venues[0][domain_attr[domain].index(attr)]
-        elif domain == 'police' and attr in police.keys():
+        if domain == 'police' and attr in police:
             return police[attr]
-        elif domain == 'taxi' and attr in taxi_dict.keys():
+        if domain == 'taxi' and attr in taxi_dict:
             return taxi_dict[attr]
-        elif domain == 'hospital' and domain in belief_state.keys():
-            if attr == 'address':
-                return '124 tenison road'
-            if attr == 'name':
-                return 'people hospital'
-            if attr == 'postcode':
-                return 'cb12dp'
+        if domain == 'hospital':
+            if attr in hospital:
+                return hospital[attr]
+            if domain in belief_state.keys():
+                if attr in belief_state[domain]:
+                    return belief_state[domain][attr]
+                venues = db.queryResultVenues(domain, bs=belief_state[domain])
+                if venues:
+                    if slot_before[attr]:
+                        for idx in range(len(venues)):
+                            if attr in venues[idx].keys() and venues[idx][attr] not in slot_before[attr]:
+                                return venues[idx][attr]
+                    else:
+                        if attr in venues[0].keys():
+                            return venues[0][attr]
+                else:
+                    venues = db.queryResultVenues(domain, bs={})
+                    if slot_before[attr]:
+                        for idx in range(len(venues)):
+                            if attr in venues[idx].keys() and venues[idx][attr] not in slot_before[attr]:
+                                return venues[idx][attr]
+                    else:
+                        if attr in venues[0].keys():
+                            return venues[0][attr]
+        if attr in belief_state[domain]:
+            return belief_state[domain][attr]
+        else:
             venues = db.queryResultVenues(domain, bs=belief_state[domain])
             if venues:
-                if slot_before[domain + '_' + attr]:
-                    for idx in range(len(venues)):
-                        if attr in venues[idx].keys() and venues[idx][attr] not in slot_before[domain + '_' + attr]:
-                            return venues[idx][attr]
-                else:
-                    if attr in venues[0].keys():
-                        return venues[0][attr]
+                if attr in domain_attr[domain]:
+                    if slot_before[attr]:
+                        for idx in range(len(venues)):
+                            if venues[idx][domain_attr[domain].index(attr)] not in slot_before[attr]:
+                                return venues[idx][domain_attr[domain].index(attr)]
+                        return venues[0][domain_attr[domain].index(attr)]
+                    else:
+                        return venues[0][domain_attr[domain].index(attr)]
             else:
                 venues = db.queryResultVenues(domain, bs={})
-                if slot_before[domain + '_' + attr]:
-                    for idx in range(len(venues)):
-                        if attr in venues[idx].keys() and venues[idx][attr] not in slot_before[domain + '_' + attr]:
-                            return venues[idx][attr]
-                else:
-                    if attr in venues[0].keys():
-                        return venues[0][attr]
+                if attr in domain_attr[domain]:
+                    if slot_before[attr]:
+                        for idx in range(len(venues)):
+                            if venues[idx][domain_attr[domain].index(attr)] not in slot_before[attr]:
+                                return venues[idx][domain_attr[domain].index(attr)]
+                        return venues[0][domain_attr[domain].index(attr)]
+                    else:
+                        return venues[0][domain_attr[domain].index(attr)]
+
         return ''
     except:
         return ''
 
-def get_talk(bs:dict, response:str):
+
+def get_talk(bs: dict, bs_before: dict):
     try:
-        domain_num_bs = len(bs.keys())
-        if 'booking' in bs.keys():
-            domain_num_bs -= 1
-        if domain_num_bs == 1:
-            for k in bs.keys():
-                if k != 'booking':
-                    return k
-        else:
-            slot_list = []
-            response = response.split()
-            for idx in range(len(response)):
-                if response[idx].startswith('[') and response[idx].endswith(']'):
-                    slot = response[idx][1:-1]
-                    slot_list.append(slot)
-                    domain = slot.split('_')[0]
-                    if domain in bs.keys() or domain in ['hospital', 'police']:
-                        return domain
-            for slot in slot_list:
-                domain = slot.split('_')[0]
-                attr = slot.split('_')[-1]
-                if domain != 'value':
-                    for k in bs.keys():
-                        if k != 'booking' and attr in domain_attr_all[k]:
-                            return k
-            for slot in slot_list:
-                attr = slot.split('_')[-1]
-                for k in bs.keys():
-                    if k != 'booking' and attr in domain_attr_all[k]:
-                        return k
-            for slot in slot_list:
-                attr = slot.split('_')[-1]
-                if attr in value_replace.keys():
-                    for k in bs.keys():
-                        if k in value_replace[attr].keys():
-                            return k
-            for domain in current_domain:
-                if domain in bs.keys():
-                    return domain
-            for slot in slot_list:
-                attr = slot.split('_')[-1]
-                for domain in ['hospital', 'police']:
-                    if attr in domain_attr_all[domain]:
-                        return domain
-            return 'hospital'
+        if len(bs) == 0:
+            return None
+        if len(bs) == 1:
+            return list(bs.keys())[0]
+        for domain in bs:
+            if domain not in bs_before:
+                return domain
+        for domain in bs:
+            if bs[domain] != bs_before[domain]:
+                return domain
+        return list(bs.keys())[0]
     except:
-        return 'hospital'
+        return None
 
-def get_item(bs:dict):
+
+def get_item(bs: dict):
     try:
         res = {}
         for domain in bs.keys():
@@ -306,7 +298,7 @@ def get_item(bs:dict):
                 else:
                     eval_bs = {}
                     for slot in bs[domain].keys():
-                        if slot in domain_attr_all[domain]:
+                        if slot in domain_attr[domain]:
                             eval_bs[slot] = bs[domain][slot]
                     venues = db.queryResultVenues(domain, bs=eval_bs)
                     random.shuffle(venues)
@@ -315,73 +307,75 @@ def get_item(bs:dict):
     except:
         return {}
 
+
 def parse_decoding_results_direct(predictions):
-            candidates = []
-            candidates_bs = []
-            for prediction in predictions:
-                prediction = prediction.strip()
-                prediction = prediction.split('=>')[-1]
-                if 'system :' in prediction:
-                    system_response = prediction.split('system :')[-1]
+    candidates = []
+    candidates_bs = []
+    for prediction in predictions:
+        prediction = prediction.strip()
+        prediction = prediction.split('=>')[-1]
+        if 'system :' in prediction:
+            system_response = prediction.split('system :')[-1]
+        else:
+            system_response = ''
+        system_response = ' '.join(word_tokenize(system_response))
+        system_response = system_response.replace('[ ', '[').replace(' ]', ']')
+        candidates.append(system_response)
+
+        prediction = prediction.strip().split('system :')[0]
+        prediction = ' '.join(prediction.split()[:])
+        try:
+            prediction = prediction.strip().split('belief :')[1]
+        except:
+            prediction = prediction.strip().split('belief :')[0]
+        domains = prediction.split('|')
+        belief_state = {}
+        for domain_ in domains:
+            if domain_ == '':
+                continue
+            if len(domain_.split()) == 0:
+                continue
+            domain = domain_.split()[0]
+            if domain == 'none':
+                continue
+            belief_state[domain] = {}
+            svs = ' '.join(domain_.split()[1:]).split(';')
+            for sv in svs:
+                if sv.strip() == '':
+                    continue
+                sv = sv.split(' = ')
+                if len(sv) != 2:
+                    continue
                 else:
-                    system_response = ''
-                system_response = ' '.join(word_tokenize(system_response))
-                system_response = system_response.replace('[ ', '[').replace(' ]', ']')
-                candidates.append(system_response)
+                    s, v = sv
+                s = s.strip()
+                v = v.strip()
+                if v == "" or v == "dontcare" or v == 'not mentioned' or v == "don't care" or \
+                        v == "dont care" or v == "do n't care" or v == 'none':
+                    continue
+                belief_state[domain][s] = v
+        candidates_bs.append(copy.copy(belief_state))
 
-                prediction = prediction.strip().split('system :')[0]
-                prediction = ' '.join(prediction.split()[:])
-                try:
-                    prediction = prediction.strip().split('belief :')[1]
-                except:
-                    prediction = prediction.strip().split('belief :')[0]
-                domains = prediction.split('|')
-                belief_state = {}
-                for domain_ in domains:
-                    if domain_ == '':
-                        continue
-                    if len(domain_.split()) == 0:
-                        continue
-                    domain = domain_.split()[0]
-                    if domain == 'none':
-                        continue
-                    belief_state[domain] = {}
-                    svs = ' '.join(domain_.split()[1:]).split(';')
-                    for sv in svs:
-                        if sv.strip() == '':
-                            continue
-                        sv = sv.split(' = ')
-                        if len(sv) != 2:
-                            continue
-                        else:
-                            s, v = sv
-                        s = s.strip()
-                        v = v.strip()
-                        if v == "" or v == "dontcare" or v == 'not mentioned' or v == "don't care" or \
-                                v == "dont care" or v == "do n't care" or v == 'none':
-                            continue
-                        belief_state[domain][s] = v
-                candidates_bs.append(copy.copy(belief_state))
+    def compare(key1, key2):
+        key1 = key1[1]
+        key2 = key2[1]
+        if key1.count('[') > key2.count('['):
+            return 1
+        elif key1.count('[') == key2.count('['):
+            return 1 if len(key1.split()) > len(key2.split()) else -1
+        else:
+            return -1
 
-            def compare(key1, key2):
-                key1 = key1[1]
-                key2 = key2[1]
-                if key1.count('[') > key2.count('['):
-                    return 1
-                elif key1.count('[') == key2.count('['):
-                    return 1 if len(key1.split()) > len(key2.split()) else -1
-                else:
-                    return -1
+    import functools
+    candidates_w_idx = [(idx, v) for idx, v in enumerate(candidates)]
+    candidates = sorted(candidates_w_idx, key=functools.cmp_to_key(compare))
+    if len(candidates) != 0:
+        idx, value = candidates[-1]
+        candidates_bs = candidates_bs[idx]
+        candidates = value
 
-            import functools
-            candidates_w_idx = [(idx, v) for idx, v in enumerate(candidates)]
-            candidates = sorted(candidates_w_idx, key=functools.cmp_to_key(compare))
-            if len(candidates) != 0:
-                idx, value = candidates[-1]
-                candidates_bs = candidates_bs[idx]
-                candidates = value
+    return candidates, candidates_bs
 
-            return candidates, candidates_bs
 
 def parse_belief_state(text):
     belief_state = {}

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- 
-# @Time : 2022/10/27 19:27 
+# @Time : 2022/11/9 20:11 
 # @Author : Shuyu Guo
 # @File : __init__.py.py 
 # @contact : guoshuyu225@gmail.com
-from .config import *
+import simtester.agent.galaxy.unified_transformer

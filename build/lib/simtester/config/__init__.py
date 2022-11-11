@@ -3,4 +3,3 @@
 # @Author : Shuyu Guo
 # @File : __init__.py.py 
 # @contact : guoshuyu225@gmail.com
-from .config import *
