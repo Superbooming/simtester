@@ -49,7 +49,7 @@ Simtester requires Python version 3.6 or later.
 
 [comment]: <> (```bash)
 
-[comment]: <> (pip install crslab)
+[comment]: <> (pip install simtester)
 
 [comment]: <> (```)
 
@@ -65,11 +65,11 @@ pip install -e .
 When you construct a agent using your own implemented model, you should fill your model instance `your_model`
 and your model interact function `your_model_interact_fn` which input the dialogue context and output the response.
 
-When you construct a agent using own trained model, you should download model first(link in [Models](#Models)). You
-should fill the model name and the responding model directory which store the model you download and the remaining
-configuration will be loaded according to default config file(in `simtester/config/multiwoz/`). Or you can fill your own
-config file(.yaml format) path and the config file should include the model name and the responding model directory.See
-the config file example in `simtester/config/multiwoz/soloist-base.yaml`.
+When you construct a agent using own trained model, the model archive file and model state file will be downloaded
+automate and you just need fill the model name. The remaining configuration will be loaded according to default config
+file(in `simtester/config/multiwoz/`). Or you can fill your own config file(.yaml format) path and the config file
+should include the model name and the responding model directory.See the config file example
+in `simtester/config/multiwoz/soloist/soloist-base.yaml`.
 
 ```bash
 # construct a agent using your own implemented model 
@@ -78,7 +78,7 @@ agent = Agent(your_model, your_model_interact_fn)
 
 # construct a gent using our trained model
 from simtester import SoloistAgent
-agent = SoloistAgent('multiwoz-soloist-base') # fill model name and model directory
+agent = SoloistAgent('multiwoz-soloist-base') # fill model name
 agent = SoloistAgent(config='simtester/config/multiwoz/soloist-base.yaml') # fill config path
 
 # interact with agent and get the response
